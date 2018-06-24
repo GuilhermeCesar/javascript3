@@ -74,4 +74,45 @@ class NegociacaoService {
                 throw new Error('Não foi possivel adicinar a negociação');
             })
     }
+  
+
+    lista(){        
+        return ConnectionFactory
+                .getConnection()
+                .then(connection => new NegociacaoDao(connection))
+                .then(dao => dao.listaTodos())
+                .catch(erro=>{
+                    console.erro(erro)
+                    throw new Error('Erro ao imporatar as negociações');
+                });
+    }
+
+
+    apaga(){
+        return ConnectionFactory
+                .getConnection()
+                .then(connection => new NegociacaoDao(connection))
+                .then(dao => dao.apagaTodos())
+                .catch((erro)=>{
+                    console.log(erro);
+                    throw new Error("Não foi possivel apagar a negocioção");
+                })
+             
+    }
+
+    importa(listaAtual){       
+            return this.obterNegociacoes()
+                .then(negociacoes=>negociacoes
+                    .filter(negociacao=>
+                        !listaAtual.some(negociacaoExistente=>
+                                negociacaoExistente.isEquals(negociacao)
+                            )                    
+                        )
+                ).catch(erro=>{
+                    console.error(erro);
+                    throw new Error(erro); 
+                })
+
+
+    }
 }

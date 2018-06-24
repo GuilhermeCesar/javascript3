@@ -1,7 +1,6 @@
 class NegociacaoController {
     
     constructor() {
-        
         let $ = document.querySelector.bind(document);
         
         this._inputData = $('#data');
@@ -18,25 +17,20 @@ class NegociacaoController {
             'texto');    
             
         this._ordemAtual = '';
+        this._negociacaoService = new NegociacaoService();
 
         this._init();
-
-        this._negociacaoService = new NegociacaoService();
+        
     }
 
     _init(){
 
-        ConnectionFactory
-        .getConnection()
-        .then(connection => new NegociacaoDao(connection))
-        .then(dao => dao.listaTodos())
-        .then(negociacoes => 
-            negociacoes.forEach(negociacao => 
+        this._negociacaoService
+            .lista()
+            .then(negociacoes => 
+                negociacoes.forEach(negociacao => 
                 this._listaNegociacoes.adiciona(negociacao)))
-        .catch(erro => {
-            console.log(erro);
-            this._mensagem.texto = erro;
-        });            
+            .catch(erro => this._mensagem.texto = erro);            
 
         setInterval(()=>this.importaNegociacoes(),3000);
     }
@@ -54,33 +48,24 @@ class NegociacaoController {
             .catch(erro => this._mensagem.texto = erro);
     }
     
-    importaNegociacoes() {
-        console.log("importar negociações");
-        let service = new NegociacaoService();
-        service
-            .obterNegociacoes()
-            .then(negociacoes=>negociacoes
-                .filter(negociacao=>!this._listaNegociacoes.negociacoes
-                    .some(negociacaoExistente=>JSON.stringify(negociacaoExistente)==JSON.stringify(negociacao))                    
-                )
-            )
-            .then(negociacoes => negociacoes.forEach(negociacao => {
-                this._listaNegociacoes.adiciona(negociacao);
-                this._mensagem.texto = 'Negociações do período importadas'   
-            }))
-            .catch(erro => this._mensagem.texto = erro);                              
+    importaNegociacoes() {        
+            this._negociacaoService
+                .importa(this._listaNegociacoes.negociacoes)      
+                .then(negociacoes => negociacoes.forEach(negociacao => {
+                    this._listaNegociacoes.adiciona(negociacao);
+                    this._mensagem.texto = 'Negociações do período importadas'   
+                }))
+                .catch(erro => this._mensagem.texto = erro);                              
     }
     
-    apaga() {
-        
-        ConnectionFactory
-            .getConnection()
-            .then(connection => new NegociacaoDao(connection))
-            .then(dao => dao.apagaTodos())
+    apaga() {        
+            this._negociacaoService
+            .apaga()
             .then(mensagem => {
                 this._mensagem.texto = mensagem;
                 this._listaNegociacoes.esvazia();
-            });
+            })
+            .catch(error=>this._mensagem.texto = error);
     }
     
     _criaNegociacao() {
