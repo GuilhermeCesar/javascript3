@@ -16,21 +16,19 @@ export class NegociacaoService {
                 return negociacoes.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor));
             })
             .catch(erro => {
-                console.log(erro);
+                console.error(erro);
                 throw new Error('Não foi possível obter as negociações da semana');
             });  
     }
     
-    obterNegociacoesDaSemanaAnterior() {
-               
+    obterNegociacoesDaSemanaAnterior() {               
         return this._http
             .get('negociacoes/anterior')
             .then(negociacoes => {
-                console.log(negociacoes);
                 return negociacoes.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor));
             })
             .catch(erro => {
-                console.log(erro);
+                console.error(erro);
                 throw new Error('Não foi possível obter as negociações da semana anterior');
             });   
     }
@@ -43,7 +41,7 @@ export class NegociacaoService {
                 return negociacoes.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor));
             })
             .catch(erro => {
-                console.log(erro);
+                console.error(erro);
                 throw new Error('Não foi possível obter as negociações da semana retrasada');
             });  
         
@@ -74,7 +72,7 @@ export class NegociacaoService {
             .then(dao=>dao.adiciona(negociacao))             
             .then(()=>"Negociação adicionada com sucesso")       
             .catch(erro=>{
-                console.log(erro)
+                console.error(erro)
                 throw new Error('Não foi possivel adicinar a negociação');
             })
     }
